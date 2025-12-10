@@ -220,6 +220,19 @@ provider.loadObject(ofClass: UIImage.self) { image, _ in
 ```
 
 ---
+## 🔹 Видео-демонстрация
+<!-- Или, если у вас короткий GIF -->
+![Demo GIF](docs/SimulatorScreenRecording.gif)
+---
+
+## 🖼 Превью UI 🔹 Скриншоты
+<div style="display:flex; gap:10px; flex-wrap: wrap;">
+  <img src="docs/screen-header.png" width="400"/>
+  <img src="docs/screen-canvas.png" width="400">
+  <img src="docs/screen-picker.png" width="400">
+</div>
+
+---
 
 ## 🧱 Installation
 
