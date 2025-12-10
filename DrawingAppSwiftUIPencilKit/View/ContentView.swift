@@ -13,7 +13,8 @@ import PhotosUI
 // It integrates PencilKit, image importing, saving, and a custom UI.
 struct ContentView: View {
     @StateObject private var vm = ContentViewModel()
-    @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var selectedItem: PhotosPickerItem?
+    @State private var image: UIImage?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -31,6 +32,13 @@ struct ContentView: View {
             ZStack {
                 if let selectedImage = vm.selectedImage {
                     Image(uiImage: selectedImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity)
+                }
+                
+                if let image {
+                    Image(uiImage: image)
                         .resizable()
                         .scaledToFit()
                         .frame(maxWidth: .infinity)
@@ -83,25 +91,25 @@ private extension ContentView {
 
             // Header Action Buttons
             HStack(spacing: 12) {
-                PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
-                    Image(systemName: "photo.on.rectangle.angled.fill")
-                        .font(.subheadline)
-                        .foregroundStyle(.white)
+                ZStack {
+                    Circle()
+                        .fill(Color.orange)
                         .frame(width: 40, height: 40)
-                        .background(.white.opacity(0.2))
-                        .clipShape(.circle)
+                    PhotosPicker(selection: $selectedItem, matching: .images) {
+                        Image(systemName: "photo.on.rectangle.angled.fill")
+                            .foregroundColor(.white)
+                    }
                 }
-                .onChange(of: selectedPhotoItem) { _ in
-                    guard let item = selectedPhotoItem else { return }
-
+                .onChange(of: selectedItem) { newItem in
                     Task { @MainActor in
+                        guard let newItem else { return }
                         do {
-                            if let data = try await item.loadTransferable(type: Data.self),
+                            if let data = try await newItem.loadTransferable(type: Data.self),
                                let uiImage = UIImage(data: data) {
-                                self.vm.selectedImage = uiImage
+                                self.image = uiImage
                             }
                         } catch {
-                            print("Ошибка загрузки изображения: \(error)")
+                            print("Ошибка загрузки фото: \(error)")
                         }
                     }
                 }
