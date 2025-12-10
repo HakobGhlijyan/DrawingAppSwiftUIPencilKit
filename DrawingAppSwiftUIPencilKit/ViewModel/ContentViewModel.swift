@@ -15,13 +15,15 @@ final class ContentViewModel: ObservableObject{
     @Published var canvasView = PKCanvasView()
     /// Tool picker for PencilKit tools.
     @Published var toolPicker = PKToolPicker()
+    
     /// Controls visibility of the PencilKit tool picker.
     @Published var showingToolPicker: Bool = true
     /// Selected background image from the photo library.
     @Published var selectedImage: UIImage?
     /// Controls presentation of the image picker.
     @Published var showingImagePicker: Bool = false
-        
+    @Published var selectedPickerItem: PhotosPickerItem?
+    
     // MARK: Save Drawing
     /// Renders the current drawing (and optional background image) into a single UIImage
     /// and saves it to the user's photo library.

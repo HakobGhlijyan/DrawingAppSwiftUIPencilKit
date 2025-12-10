@@ -13,8 +13,6 @@ import PhotosUI
 // It integrates PencilKit, image importing, saving, and a custom UI.
 struct ContentView: View {
     @StateObject private var vm = ContentViewModel()
-    @State private var selectedItem: PhotosPickerItem?
-    @State private var image: UIImage?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -32,13 +30,6 @@ struct ContentView: View {
             ZStack {
                 if let selectedImage = vm.selectedImage {
                     Image(uiImage: selectedImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity)
-                }
-                
-                if let image {
-                    Image(uiImage: image)
                         .resizable()
                         .scaledToFit()
                         .frame(maxWidth: .infinity)
@@ -95,18 +86,18 @@ private extension ContentView {
                     Circle()
                         .fill(Color.orange)
                         .frame(width: 40, height: 40)
-                    PhotosPicker(selection: $selectedItem, matching: .images) {
+                    PhotosPicker(selection: $vm.selectedPickerItem, matching: .images) {
                         Image(systemName: "photo.on.rectangle.angled.fill")
                             .foregroundColor(.white)
                     }
                 }
-                .onChange(of: selectedItem) { newItem in
+                .onChange(of: vm.selectedPickerItem) { newItem in
                     Task { @MainActor in
                         guard let newItem else { return }
                         do {
                             if let data = try await newItem.loadTransferable(type: Data.self),
                                let uiImage = UIImage(data: data) {
-                                self.image = uiImage
+                                self.vm.selectedImage = uiImage
                             }
                         } catch {
                             print("Ошибка загрузки фото: \(error)")
