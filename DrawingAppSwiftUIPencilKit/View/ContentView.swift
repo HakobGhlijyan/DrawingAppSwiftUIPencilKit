@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 // MARK: - ContentView
 // This SwiftUI view represents the main screen of the drawing application.
@@ -39,10 +40,17 @@ struct ContentView: View {
         }
         .ignoresSafeArea(edges: .vertical)
         .sheet(isPresented: $vm.showingImagePicker) {
-            ImagePicker(image: $vm.selectedImage)
+//            ImagePicker(image: $vm.selectedImage)
+            ImageOrCameraPicker(image: $vm.selectedImage, sourceType: .photoLibrary)
         }
         .onAppear(perform: vm.appeared)
-    }
+        .alert(isPresented: $vm.showSaveAlert) {
+            Alert(
+                title: Text("Сохранение"),
+                message: Text(vm.saveMessage),
+                dismissButton: .default(Text("Ок"))
+            )
+        }    }
 }
 
 #Preview {
@@ -63,7 +71,7 @@ private extension ContentView {
         HStack(spacing: 20) {
             // Title & Icon
             HStack(spacing: 12) {
-                Image(systemName: "pencil.and.scribble")
+                Image(systemName: "pencil.and.outline")
                     .font(.title3)
                 Text("InkBoard")
                     .font(.system(size: 20, weight: .bold, design: .rounded))
@@ -74,8 +82,15 @@ private extension ContentView {
 
             // Header Action Buttons
             HStack(spacing: 12) {
-                HeaderButton(icon: "photo.on.rectangle.angled", color: .white) {
-                    vm.showingImagePicker = true
+                if #available(iOS 16.0, *) {
+                    PhotosPicker(selection: $vm.selectedPhotoItem, matching: .images) {
+                        HeaderButton(icon: "photo.on.rectangle.angled.fill", color: .white)
+                    }
+                } else {
+                    // fallback to old PHPicker
+                    HeaderButton(icon: "photo.on.rectangle.angled", color: .white) {
+                        vm.showingImagePicker = true
+                    }
                 }
                 
                 HeaderButton(icon: "trash", color: .white) {

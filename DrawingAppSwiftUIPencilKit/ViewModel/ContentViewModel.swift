@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 import PencilKit
+import PhotosUI
 
 final class ContentViewModel: ObservableObject{
     /// PKCanvasView instance used for drawing.
@@ -18,25 +19,38 @@ final class ContentViewModel: ObservableObject{
     @Published var showingToolPicker: Bool = true
     /// Selected background image from the photo library.
     @Published var selectedImage: UIImage?
+    
+    @Published private var _selectedPhotoItem: Any? // internal storage
+    
+    @available(iOS 16.0, *)
+    var selectedPhotoItem: PhotosPickerItem? {
+        get { _selectedPhotoItem as? PhotosPickerItem }
+        set { _selectedPhotoItem = newValue }
+    }
+    
     /// Controls presentation of the image picker.
     @Published var showingImagePicker: Bool = false
-
+    
+    // Для показа Alert
+    @Published var showSaveAlert = false
+    @Published var saveMessage = ""
+    
     // MARK: Save Drawing
     /// Renders the current drawing (and optional background image) into a single UIImage
     /// and saves it to the user's photo library.
     func saveDrawing() {
         let bounds = canvasView.bounds
         let renderer = UIGraphicsImageRenderer(bounds: bounds)
-
+        
         let image = renderer.image { context in
             
             // --- 1. Fill background white
             UIColor.white.setFill()
             context.fill(bounds)
-
+            
             // --- 2. Draw background image with aspectFit (NOT full stretch)
             if let selectedImage {
-
+                
                 let imageSize = selectedImage.size
                 let canvasSize = bounds.size
                 
@@ -67,10 +81,10 @@ final class ContentViewModel: ObservableObject{
                         height: height
                     )
                 }
-
+                
                 selectedImage.draw(in: drawRect)
             }
-
+            
             // --- 3. Draw PencilKit drawing on top
             let drawingImage = canvasView.drawing.image(
                 from: bounds,
@@ -78,9 +92,22 @@ final class ContentViewModel: ObservableObject{
             )
             drawingImage.draw(in: bounds)
         }
-
-        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+        
+        // Сохраняем и обрабатываем результат
+        UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveCompletion(_:didFinishSavingWithError:contextInfo:)), nil)
     }
+    
+    @objc private func saveCompletion(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+        DispatchQueue.main.async {
+            if let error = error {
+                self.saveMessage = "Ошибка при сохранении: \(error.localizedDescription)"
+            } else {
+                self.saveMessage = "Изображение успешно сохранено!"
+            }
+            self.showSaveAlert = true
+        }
+    }
+    
     
     // MARK: Appearance Configuration
     /// Configures the PencilKit tool picker and prepares the canvas.
@@ -90,9 +117,28 @@ final class ContentViewModel: ObservableObject{
         toolPicker.addObserver(canvasView)
         canvasView.becomeFirstResponder()
     }
-
+    
     func clear() {
         canvasView.drawing = PKDrawing()
         selectedImage = nil
     }
+    
+    @available(iOS 16.0, *)
+    func loadImage() {
+        guard let item = selectedPhotoItem else { return }
+        
+        Task {
+            do {
+                if let data = try await item.loadTransferable(type: Data.self),
+                   let uiImage = UIImage(data: data) {
+                    await MainActor.run {
+                        self.selectedImage = uiImage
+                    }
+                }
+            } catch {
+                print("Ошибка загрузки изображения: \(error)")
+            }
+        }
+    }
+    
 }

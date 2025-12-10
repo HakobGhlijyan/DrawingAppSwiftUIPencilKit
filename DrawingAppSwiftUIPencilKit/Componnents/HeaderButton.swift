@@ -14,10 +14,12 @@ import PhotosUI
 struct HeaderButton: View {
     var icon: String
     var color: Color
-    var action: () -> Void
-
+    var action: (() -> Void)?
+    
     var body: some View {
-        Button(action: action) {
+        Button {
+            action?()
+        } label: {
             Image(systemName: icon)
                 .font(.subheadline)
                 .foregroundStyle(color)

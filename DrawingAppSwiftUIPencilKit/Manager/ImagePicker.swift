@@ -54,3 +54,40 @@ struct ImagePicker: UIViewControllerRepresentable {
         }
     }
 }
+
+struct ImageOrCameraPicker: UIViewControllerRepresentable {
+    @Binding var image: UIImage?
+    var sourceType: UIImagePickerController.SourceType = .photoLibrary
+    var allowEditing: UIImagePickerController.InfoKey = .editedImage
+    
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController ()
+        picker.allowsEditing = allowEditing == .editedImage
+        picker.sourceType = sourceType
+        picker.delegate = context.coordinator
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {
+        
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+        var parent: ImageOrCameraPicker
+        
+        init(_ parent: ImageOrCameraPicker) {
+            self.parent = parent
+        }
+        
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            if let uiImage = info[parent.allowEditing] as? UIImage {
+                self.parent.image = uiImage
+            }
+            picker.dismiss(animated: true)
+        }
+    }
+}
