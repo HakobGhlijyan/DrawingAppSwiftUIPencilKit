@@ -21,7 +21,7 @@ struct ContentView: View {
                 background
                 header
             }
-            .frame(height: 120)
+            .frame(height: 60)
             .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
             
             // MARK: Drawing Canvas
@@ -41,7 +41,7 @@ struct ContentView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(.white)
         }
-        .ignoresSafeArea(edges: .vertical)
+//        .ignoresSafeArea(edges: .vertical)
         .sheet(isPresented: $vm.showingImagePicker) {
 //            ImagePicker(image: $vm.selectedImage)
             ImageOrCameraPicker(image: $vm.selectedImage, sourceType: .photoLibrary)
@@ -66,14 +66,20 @@ private extension ContentView {
     var header: some View {
         HStack(spacing: 20) {
             // Title & Icon
-            HStack(spacing: 12) {
+            ViewThatFits {
+                HStack(spacing: 12) {
+                    Image(systemName: "pencil.and.outline")
+                        .font(.subheadline)
+                    Text("InkBoard")
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                }
+                .foregroundStyle(.white)
+                
                 Image(systemName: "pencil.and.outline")
-                    .font(.title3)
-                Text("InkBoard")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .font(.title3).bold()
+                    .foregroundStyle(.white)
             }
-            .foregroundStyle(.white)
-
+            
             Spacer()
 
             // Header Action Buttons
