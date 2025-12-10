@@ -10,9 +10,22 @@
 		345A93AE2EE998EA00EE50F8 /* DrawingAppSwiftUIPencilKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DrawingAppSwiftUIPencilKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3481652D2EE9E6D300A0F367 /* Exceptions for "DrawingAppSwiftUIPencilKit" folder in "DrawingAppSwiftUIPencilKit" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 345A93AD2EE998EA00EE50F8 /* DrawingAppSwiftUIPencilKit */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		345A93B02EE998EA00EE50F8 /* DrawingAppSwiftUIPencilKit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3481652D2EE9E6D300A0F367 /* Exceptions for "DrawingAppSwiftUIPencilKit" folder in "DrawingAppSwiftUIPencilKit" target */,
+			);
 			path = DrawingAppSwiftUIPencilKit;
 			sourceTree = "<group>";
 		};
@@ -254,6 +267,7 @@
 				DEVELOPMENT_TEAM = 2LV8FZL3V7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DrawingAppSwiftUIPencilKit/Info.plist;
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "For Use Photo library";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "For Use Photo library";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -289,6 +303,7 @@
 				DEVELOPMENT_TEAM = 2LV8FZL3V7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DrawingAppSwiftUIPencilKit/Info.plist;
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "For Use Photo library";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "For Use Photo library";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

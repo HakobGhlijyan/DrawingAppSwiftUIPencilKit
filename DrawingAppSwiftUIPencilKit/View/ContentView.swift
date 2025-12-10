@@ -21,10 +21,8 @@ struct ContentView: View {
                 background
                 header
             }
-            .frame(height: 60)
-            .topPaddingForDevice()
+            .frame(height: 120)
             .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
-            .zIndex(0)
             
             // MARK: Drawing Canvas
             ZStack {
@@ -42,14 +40,12 @@ struct ContentView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(.white)
-            .zIndex(1)
         }
         .ignoresSafeArea(edges: .vertical)
         .sheet(isPresented: $vm.showingImagePicker) {
 //            ImagePicker(image: $vm.selectedImage)
             ImageOrCameraPicker(image: $vm.selectedImage, sourceType: .photoLibrary)
         }
-        .onAppear(perform: vm.appeared)
     }
 }
 

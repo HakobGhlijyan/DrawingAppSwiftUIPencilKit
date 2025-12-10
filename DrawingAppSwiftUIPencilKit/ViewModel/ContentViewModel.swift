@@ -24,6 +24,8 @@ final class ContentViewModel: ObservableObject{
     @Published var showingImagePicker: Bool = false
     @Published var selectedPickerItem: PhotosPickerItem?
     
+    init() { appeared() }
+    
     // MARK: Save Drawing
     /// Renders the current drawing (and optional background image) into a single UIImage
     /// and saves it to the user's photo library.
