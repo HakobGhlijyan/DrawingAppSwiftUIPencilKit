@@ -106,25 +106,59 @@ struct ContentView: View {
         let renderer = UIGraphicsImageRenderer(bounds: bounds)
 
         let image = renderer.image { context in
+            
+            // --- 1. Fill background white
+            UIColor.white.setFill()
+            context.fill(bounds)
+
+            // --- 2. Draw background image with aspectFit (NOT full stretch)
             if let selectedImage {
-                // Draw background image first
-                selectedImage.draw(in: bounds)
-            } else {
-                // Otherwise fill with white background
-                UIColor.white.setFill()
-                context.fill(bounds)
+
+                let imageSize = selectedImage.size
+                let canvasSize = bounds.size
+                
+                // Calculate aspectFit rect
+                let imageAspect = imageSize.width / imageSize.height
+                let canvasAspect = canvasSize.width / canvasSize.height
+                
+                var drawRect = CGRect.zero
+                
+                if imageAspect > canvasAspect {
+                    // image is wider → full width, height scaled
+                    let width = canvasSize.width
+                    let height = width / imageAspect
+                    drawRect = CGRect(
+                        x: 0,
+                        y: (canvasSize.height - height) / 2,
+                        width: width,
+                        height: height
+                    )
+                } else {
+                    // image is taller → full height, width scaled
+                    let height = canvasSize.height
+                    let width = height * imageAspect
+                    drawRect = CGRect(
+                        x: (canvasSize.width - width) / 2,
+                        y: 0,
+                        width: width,
+                        height: height
+                    )
+                }
+
+                selectedImage.draw(in: drawRect)
             }
 
-            // Draw PencilKit content on top
-            canvasView
-                .drawing
-                .image(from: bounds, scale: UIScreen.main.scale)
-                .draw(in: bounds)
+            // --- 3. Draw PencilKit drawing on top
+            let drawingImage = canvasView.drawing.image(
+                from: bounds,
+                scale: UIScreen.main.scale
+            )
+            drawingImage.draw(in: bounds)
         }
 
         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
     }
-
+    
     // MARK: Appearance Configuration
     /// Configures the PencilKit tool picker and prepares the canvas.
     private func appeared() {
