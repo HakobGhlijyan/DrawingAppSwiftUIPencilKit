@@ -161,8 +161,8 @@ struct DottedGridView: View {
 
             for row in 0...rows {
                 for column in 0...columns {
-                    let x = CGFloat(column) + spacing
-                    let y = CGFloat(row) + spacing
+                    let x = CGFloat(column) * spacing
+                    let y = CGFloat(row) * spacing
                     let rect = CGRect(x: x, y: y, width: dotSize, height: dotSize)
 
                     context.fill(
