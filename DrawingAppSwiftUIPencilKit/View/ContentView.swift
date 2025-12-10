@@ -46,10 +46,10 @@ struct ContentView: View {
             .zIndex(1)
         }
         .ignoresSafeArea(edges: .vertical)
-//        .sheet(isPresented: $vm.showingImagePicker) {
+        .sheet(isPresented: $vm.showingImagePicker) {
 //            ImagePicker(image: $vm.selectedImage)
-//            ImageOrCameraPicker(image: $vm.selectedImage, sourceType: .photoLibrary)
-//        }
+            ImageOrCameraPicker(image: $vm.selectedImage, sourceType: .photoLibrary)
+        }
         .onAppear(perform: vm.appeared)
     }
 }
@@ -105,7 +105,11 @@ private extension ContentView {
                         }
                     }
                 }
-
+                
+                HeaderButton(icon: "photo.on.rectangle.angled", color: .white) {
+                    vm.showingImagePicker = true
+                }
+                
                 HeaderButton(icon: "trash", color: .white) {
                     vm.clear()
                 }
