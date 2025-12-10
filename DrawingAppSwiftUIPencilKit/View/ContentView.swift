@@ -13,7 +13,8 @@ import PhotosUI
 // It integrates PencilKit, image importing, saving, and a custom UI.
 struct ContentView: View {
     @StateObject private var vm = ContentViewModel()
-    
+    @State private var selectedPhotoItem: PhotosPickerItem?
+
     var body: some View {
         VStack(spacing: 0) {
             // MARK: Header
@@ -25,10 +26,16 @@ struct ContentView: View {
             .topPaddingForDevice()
             .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
             .zIndex(0)
-
+            
             // MARK: Drawing Canvas
             ZStack {
-                image
+                if let selectedImage = vm.selectedImage {
+                    Image(uiImage: selectedImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity)
+                }
+                
                 // Optional dotted grid background
                 DottedGridView()
                 // PencilKit Canvas
@@ -39,18 +46,12 @@ struct ContentView: View {
             .zIndex(1)
         }
         .ignoresSafeArea(edges: .vertical)
-        .sheet(isPresented: $vm.showingImagePicker) {
+//        .sheet(isPresented: $vm.showingImagePicker) {
 //            ImagePicker(image: $vm.selectedImage)
-            ImageOrCameraPicker(image: $vm.selectedImage, sourceType: .photoLibrary)
-        }
+//            ImageOrCameraPicker(image: $vm.selectedImage, sourceType: .photoLibrary)
+//        }
         .onAppear(perform: vm.appeared)
-        .alert(isPresented: $vm.showSaveAlert) {
-            Alert(
-                title: Text("Сохранение"),
-                message: Text(vm.saveMessage),
-                dismissButton: .default(Text("Ок"))
-            )
-        }    }
+    }
 }
 
 #Preview {
@@ -82,17 +83,29 @@ private extension ContentView {
 
             // Header Action Buttons
             HStack(spacing: 12) {
-                if #available(iOS 16.0, *) {
-                    PhotosPicker(selection: $vm.selectedPhotoItem, matching: .images) {
-                        HeaderButton(icon: "photo.on.rectangle.angled.fill", color: .white)
-                    }
-                } else {
-                    // fallback to old PHPicker
-                    HeaderButton(icon: "photo.on.rectangle.angled", color: .white) {
-                        vm.showingImagePicker = true
+                PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                    Image(systemName: "photo.on.rectangle.angled.fill")
+                        .font(.subheadline)
+                        .foregroundStyle(.white)
+                        .frame(width: 40, height: 40)
+                        .background(.white.opacity(0.2))
+                        .clipShape(.circle)
+                }
+                .onChange(of: selectedPhotoItem) { _ in
+                    guard let item = selectedPhotoItem else { return }
+
+                    Task { @MainActor in
+                        do {
+                            if let data = try await item.loadTransferable(type: Data.self),
+                               let uiImage = UIImage(data: data) {
+                                self.vm.selectedImage = uiImage
+                            }
+                        } catch {
+                            print("Ошибка загрузки изображения: \(error)")
+                        }
                     }
                 }
-                
+
                 HeaderButton(icon: "trash", color: .white) {
                     vm.clear()
                 }
@@ -104,16 +117,5 @@ private extension ContentView {
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 10)
-    }
-    
-    var image: some View {
-        Group {
-            if let selectedImage = vm.selectedImage {
-                Image(uiImage: selectedImage)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity)
-            }
-        }
     }
 }
