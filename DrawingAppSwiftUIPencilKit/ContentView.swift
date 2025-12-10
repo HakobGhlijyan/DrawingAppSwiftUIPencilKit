@@ -34,14 +34,15 @@ struct ContentView: View {
                     Color.orange.opacity(0.8),
                     Color.red.opacity(0.8)
                 ], startPoint: .leading, endPoint: .trailing)
-
+                .ignoresSafeArea()
+                
                 HStack(spacing: 20) {
                     // Title & Icon
                     HStack(spacing: 12) {
                         Image(systemName: "pencil.and.scribble")
                             .font(.title3)
                         Text("InkBoard")
-                            .font(.system(size: 24, weight: .bold, design: .rounded))
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
                     }
                     .foregroundStyle(.white)
 
@@ -64,22 +65,31 @@ struct ContentView: View {
                     }
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 50)
-                .padding(.bottom, 16)
+                .padding(.bottom, 10)
             }
-            .frame(height: 100)
+            .frame(height: 60)
+            .topPaddingForDevice()
             .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
+            .zIndex(0)
 
             // MARK: Drawing Canvas
             ZStack {
+                if let selectedImage {
+                    Image(uiImage: selectedImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity)
+                }
+
                 // Optional dotted grid background
                 DottedGridView()
-
+                
                 // PencilKit Canvas
                 PencilKitKanvas(canvasView: $canvasView, toolPicker: $toolPicker)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(.white)
+            .zIndex(1)
         }
         .ignoresSafeArea(edges: .vertical)
         .sheet(isPresented: $showingImagePicker) {
