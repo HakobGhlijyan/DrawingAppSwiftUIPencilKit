@@ -5,27 +5,38 @@
 //  Created by Hakob Ghlijyan on 12/10/25.
 //
 
+// MARK: - ContentView
+// This SwiftUI view represents the main screen of the drawing application.
+// It integrates PencilKit, image importing, saving, and a custom UI.
+
 import SwiftUI
 import PencilKit
 import PhotosUI
 
 struct ContentView: View {
+    /// PKCanvasView instance used for drawing.
     @State private var canvasView = PKCanvasView()
+    /// Tool picker for PencilKit tools.
     @State private var toolPicker = PKToolPicker()
+    /// Controls visibility of the PencilKit tool picker.
     @State private var showingToolPicker: Bool = true
+    /// Selected background image from the photo library.
     @State private var selectedImage: UIImage?
+    /// Controls presentation of the image picker.
     @State private var showingImagePicker: Bool = false
 
-    
     var body: some View {
         VStack(spacing: 0) {
-            //Header
+            // MARK: Header
             ZStack(alignment: .bottom) {
+                // Background gradient
                 LinearGradient(colors: [
-                    Color.orange.opacity(0.8), Color.red.opacity(0.8),
+                    Color.orange.opacity(0.8),
+                    Color.red.opacity(0.8)
                 ], startPoint: .leading, endPoint: .trailing)
-                
+
                 HStack(spacing: 20) {
+                    // Title & Icon
                     HStack(spacing: 12) {
                         Image(systemName: "pencil.and.scribble")
                             .font(.title3)
@@ -33,17 +44,20 @@ struct ContentView: View {
                             .font(.system(size: 24, weight: .bold, design: .rounded))
                     }
                     .foregroundStyle(.white)
-                    
+
                     Spacer()
-                    
+
+                    // Header Action Buttons
                     HStack(spacing: 12) {
                         HeaderButton(icon: "photo.on.rectangle.angled", color: .white) {
                             showingImagePicker = true
                         }
+                        
                         HeaderButton(icon: "trash", color: .white) {
                             canvasView.drawing = PKDrawing()
                             selectedImage = nil
                         }
+                        
                         HeaderButton(icon: "square.and.arrow.down", color: .white) {
                             saveDrawing()
                         }
@@ -53,15 +67,15 @@ struct ContentView: View {
                 .padding(.top, 50)
                 .padding(.bottom, 16)
             }
-            .frame(height: 130)
+            .frame(height: 100)
             .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
-            
-            //Canvas
+
+            // MARK: Drawing Canvas
             ZStack {
-                //Background
+                // Optional dotted grid background
                 DottedGridView()
-                
-                //Canvas
+
+                // PencilKit Canvas
                 PencilKitKanvas(canvasView: $canvasView, toolPicker: $toolPicker)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -73,30 +87,36 @@ struct ContentView: View {
         }
         .onAppear(perform: appeared)
     }
-    
+
+    // MARK: Save Drawing
+    /// Renders the current drawing (and optional background image) into a single UIImage
+    /// and saves it to the user's photo library.
     private func saveDrawing() {
         let bounds = canvasView.bounds
         let renderer = UIGraphicsImageRenderer(bounds: bounds)
-        
+
         let image = renderer.image { context in
             if let selectedImage {
-                //Draw background image if exists
+                // Draw background image first
                 selectedImage.draw(in: bounds)
             } else {
-                //Draw white background
+                // Otherwise fill with white background
                 UIColor.white.setFill()
                 context.fill(bounds)
             }
-            
-            //Draw the canvas drawing on top
+
+            // Draw PencilKit content on top
             canvasView
                 .drawing
                 .image(from: bounds, scale: UIScreen.main.scale)
                 .draw(in: bounds)
         }
+
         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
     }
-    
+
+    // MARK: Appearance Configuration
+    /// Configures the PencilKit tool picker and prepares the canvas.
     private func appeared() {
         canvasView.drawingPolicy = .anyInput
         toolPicker.setVisible(true, forFirstResponder: canvasView)
@@ -109,6 +129,8 @@ struct ContentView: View {
     ContentView()
 }
 
+// MARK: - Header Button
+/// Custom reusable icon button used in the app header.
 struct HeaderButton: View {
     var icon: String
     var color: Color
@@ -126,22 +148,23 @@ struct HeaderButton: View {
     }
 }
 
+// MARK: - Dotted Grid Background
+/// Draws a grid of evenly spaced dots using `Canvas`. Used as a decorative drawing background.
 struct DottedGridView: View {
     let dotSize: CGFloat = 2
     let spacing: CGFloat = 20
-    
+
     var body: some View {
         Canvas { context, size in
             let rows = Int(size.height / spacing)
             let columns = Int(size.width / spacing)
-            
+
             for row in 0...rows {
                 for column in 0...columns {
                     let x = CGFloat(column) + spacing
                     let y = CGFloat(row) + spacing
-                    
                     let rect = CGRect(x: x, y: y, width: dotSize, height: dotSize)
-                    
+
                     context.fill(
                         Path(ellipseIn: rect),
                         with: .color(.gray.opacity(0.2))
@@ -152,10 +175,13 @@ struct DottedGridView: View {
     }
 }
 
+// MARK: - PencilKit Canvas Wrapper
+/// Wraps `PKCanvasView` into SwiftUI using `UIViewRepresentable`.
+/// Responsible for configuring the drawing tool and syncing tool picker.
 struct PencilKitKanvas: UIViewRepresentable {
     @Binding var canvasView: PKCanvasView
     @Binding var toolPicker: PKToolPicker
-    
+
     func makeUIView(context: Context) -> PKCanvasView {
         canvasView.tool = PKInkingTool(.pen, color: .black, width: 2)
         canvasView.backgroundColor = .clear
@@ -163,40 +189,45 @@ struct PencilKitKanvas: UIViewRepresentable {
         canvasView.drawingPolicy = .anyInput
         return canvasView
     }
+
     func updateUIView(_ uiView: PKCanvasView, context: Context) { }
 }
 
+// MARK: - Image Picker for Importing Photos
+/// A wrapper around `PHPickerViewController` for selecting a background image from the photo library.
 struct ImagePicker: UIViewControllerRepresentable {
     @Binding var image: UIImage?
     var sourceType: UIImagePickerController.SourceType = .photoLibrary
     var allowEditing: UIImagePickerController.InfoKey = .editedImage
     @Environment(\.dismiss) private var dismiss
-    
+
     func makeUIViewController(context: Context) -> PHPickerViewController {
         var config = PHPickerConfiguration()
         config.filter = .images
         config.selectionLimit = 1
-        
+
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = context.coordinator
         return picker
     }
-    
+
     func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) { }
-    
+
     func makeCoordinator() -> Coordinator { Coordinator(self) }
-    
+
+    // MARK: Coordinator
+    /// Handles the result of the image selection process.
     class Coordinator: NSObject, PHPickerViewControllerDelegate {
         var parent: ImagePicker
-        
+
         init(_ parent: ImagePicker) {
             self.parent = parent
         }
-        
+
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
             parent.dismiss()
             guard let provider = results.first?.itemProvider else { return }
-            
+
             if provider.canLoadObject(ofClass: UIImage.self) {
                 provider.loadObject(ofClass: UIImage.self) { image, _ in
                     DispatchQueue.main.async {
