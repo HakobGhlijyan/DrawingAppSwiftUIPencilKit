@@ -50,11 +50,6 @@ struct ContentView: View {
                 successOverlay
             }
         }
-//        .ignoresSafeArea(edges: .vertical)
-        .sheet(isPresented: $vm.showingImagePicker) {
-//            ImagePicker(image: $vm.selectedImage)
-            ImageOrCameraPicker(image: $vm.selectedImage, sourceType: .photoLibrary)
-        }
         .alert("Saved!", isPresented: $vm.showSaveAlert) {
             Button("OK", role: .cancel) { }
         } message: {
@@ -121,23 +116,10 @@ private extension ContentView {
                     }
                 }
                 
-                HeaderButton(icon: "photo.on.rectangle.angled", color: .white) {
-                    vm.showingImagePicker = true
-                }
-                
                 HeaderButton(icon: "trash", color: .white) {
                     vm.clear()
                 }
                 
-//                HeaderButton(icon: "square.and.arrow.down", color: .white) {
-//                    vm.saveDrawing()
-//                }
-//                HeaderButton(icon: "square.and.arrow.down", color: .white) {
-//                    vm.saveDrawing { success in
-//                        vm.alertMessage = success ? "Saved successfully!" : "Saving failed"
-//                        vm.showAlert = true
-//                    }
-//                }
                 HeaderButton(icon: "square.and.arrow.down", color: .white) {
                     vm.saveDrawing()
                 }
