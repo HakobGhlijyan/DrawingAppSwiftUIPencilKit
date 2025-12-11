@@ -268,6 +268,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DrawingAppSwiftUIPencilKit/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Drawing Pencil";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "For Use Photo library";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "For Use Photo library";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -304,6 +306,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DrawingAppSwiftUIPencilKit/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Drawing Pencil";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "For Use Photo library";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "For Use Photo library";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

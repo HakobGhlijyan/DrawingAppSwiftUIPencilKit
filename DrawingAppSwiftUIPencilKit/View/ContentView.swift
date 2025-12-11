@@ -41,10 +41,24 @@ struct ContentView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(.white)
         }
+        .overlay(alignment: .center) {
+            if vm.isSaving {
+                savingOverlay
+            }
+
+            if vm.showSuccess {
+                successOverlay
+            }
+        }
 //        .ignoresSafeArea(edges: .vertical)
         .sheet(isPresented: $vm.showingImagePicker) {
 //            ImagePicker(image: $vm.selectedImage)
             ImageOrCameraPicker(image: $vm.selectedImage, sourceType: .photoLibrary)
+        }
+        .alert("Saved!", isPresented: $vm.showSaveAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Your drawing has been saved to the Photos app.")
         }
     }
 }
@@ -115,6 +129,15 @@ private extension ContentView {
                     vm.clear()
                 }
                 
+//                HeaderButton(icon: "square.and.arrow.down", color: .white) {
+//                    vm.saveDrawing()
+//                }
+//                HeaderButton(icon: "square.and.arrow.down", color: .white) {
+//                    vm.saveDrawing { success in
+//                        vm.alertMessage = success ? "Saved successfully!" : "Saving failed"
+//                        vm.showAlert = true
+//                    }
+//                }
                 HeaderButton(icon: "square.and.arrow.down", color: .white) {
                     vm.saveDrawing()
                 }
@@ -122,5 +145,29 @@ private extension ContentView {
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 10)
+    }
+    
+    var savingOverlay: some View {
+        VStack(spacing: 12) {
+            ProgressView()
+                .scaleEffect(1.4)
+                .tint(.white)
+
+            Text("Saving…")
+                .font(.headline)
+                .foregroundColor(.white)
+        }
+        .padding(30)
+        .background(.black.opacity(0.6))
+        .cornerRadius(20)
+        .transition(.opacity)
+    }
+    
+    var successOverlay: some View {
+        Image(systemName: "checkmark.circle.fill")
+            .symbolRenderingMode(.palette)
+            .foregroundStyle(.white, .green)
+            .font(.system(size: 80))
+            .transition(.scale.combined(with: .opacity))
     }
 }
