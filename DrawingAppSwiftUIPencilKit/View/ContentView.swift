@@ -50,9 +50,7 @@ struct ContentView: View {
                 successOverlay
             }
         }
-//        .ignoresSafeArea(edges: .vertical)
         .sheet(isPresented: $vm.showingImagePicker) {
-//            ImagePicker(image: $vm.selectedImage)
             ImageOrCameraPicker(image: $vm.selectedImage, sourceType: .photoLibrary)
         }
         .alert("Saved!", isPresented: $vm.showSaveAlert) {
@@ -80,47 +78,16 @@ private extension ContentView {
     var header: some View {
         HStack(spacing: 20) {
             // Title & Icon
-            ViewThatFits {
-                HStack(spacing: 12) {
-                    Image(systemName: "pencil.and.outline")
-                        .font(.subheadline)
-                    Text("InkBoard")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                }
-                .foregroundStyle(.white)
-                
+            HStack(spacing: 12) {
                 Image(systemName: "pencil.and.outline")
-                    .font(.title3).bold()
-                    .foregroundStyle(.white)
+                    .font(.subheadline)
+                Text("InkBoard")
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
             }
-            
-            Spacer()
+            .foregroundStyle(.white)
 
             // Header Action Buttons
             HStack(spacing: 12) {
-                ZStack {
-                    Circle()
-                        .fill(Color.orange)
-                        .frame(width: 40, height: 40)
-                    PhotosPicker(selection: $vm.selectedPickerItem, matching: .images) {
-                        Image(systemName: "photo.on.rectangle.angled.fill")
-                            .foregroundColor(.white)
-                    }
-                }
-                .onChange(of: vm.selectedPickerItem) { newItem in
-                    Task { @MainActor in
-                        guard let newItem else { return }
-                        do {
-                            if let data = try await newItem.loadTransferable(type: Data.self),
-                               let uiImage = UIImage(data: data) {
-                                self.vm.selectedImage = uiImage
-                            }
-                        } catch {
-                            print("Ошибка загрузки фото: \(error)")
-                        }
-                    }
-                }
-                
                 HeaderButton(icon: "photo.on.rectangle.angled", color: .white) {
                     vm.showingImagePicker = true
                 }
@@ -129,15 +96,6 @@ private extension ContentView {
                     vm.clear()
                 }
                 
-//                HeaderButton(icon: "square.and.arrow.down", color: .white) {
-//                    vm.saveDrawing()
-//                }
-//                HeaderButton(icon: "square.and.arrow.down", color: .white) {
-//                    vm.saveDrawing { success in
-//                        vm.alertMessage = success ? "Saved successfully!" : "Saving failed"
-//                        vm.showAlert = true
-//                    }
-//                }
                 HeaderButton(icon: "square.and.arrow.down", color: .white) {
                     vm.saveDrawing()
                 }
