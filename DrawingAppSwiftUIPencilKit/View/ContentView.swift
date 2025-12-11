@@ -85,7 +85,7 @@ private extension ContentView {
                     .font(.system(size: 16, weight: .bold, design: .rounded))
             }
             .foregroundStyle(.white)
-
+            Spacer()
             // Header Action Buttons
             HStack(spacing: 12) {
                 HeaderButton(icon: "photo.on.rectangle.angled", color: .white) {
